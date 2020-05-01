@@ -1,33 +1,35 @@
-# Motion detection Telegram integrated
-I needed a surveillance system for my new house but I didn’t want to buy something already assembled for three main reasons:
-1. They are incredibly **expensive**. For my project, I used things that I already had, but anyway still below $35.00
-2. They are deeply **insecure**: any IoT gadget can be hacked in a second and often they expose themselves over the Internet. Thanks to the Telegram bot system, my project is (almost) confined to the local network and has no open services (other than ssh).
-3. It’s **fun**.
-
-![Starting the script](https://www.ttan.org/disk/engine.png)
-
-For this little home project I used:
-- [Onion Omega2+][1] ($9.00)
-- [Expansions header][2] for Omega2+ ($15.00)
--  [USB OTG UVC endoscope camera][3] module with leds ($11.00)
+# Motion detection Telegram integrated for Raspberry Pi
+If you have a Raspberry Pi with the camera module, with this script you can set up a security system with motion detection. I inspired the bot in *The Palantiri* of the Tolkien Legendarium.
 
 The project is composed of 3 scripts:
-- [Motion][4]: the software that monitors the webcam and takes pictures  when motion is detected. 
-- `motion.py`: the script triggered by the Motion’s parameter `on_motion_detected ` , that sends the last picture taken via Telegram to my self.
-- `engine.py`: the core of my script. This is the Telegram bot engine which controls the whole project.
+- `Motion`: the software that monitors the webcam and takes pictures  when motion is detected.
+- `motion.py`: the script triggered by the Motion’s parameter `on_motion_detected ` , that sends a message taken via Telegram to my self.
+- `engine.py`: the core of the script. This is the Telegram bot engine which controls the whole project.
 
-Since I’m working on Omega2+, my working directory is `/root/motion`, so you should change all paths if you’re using a different *cwd*. In both `motion.py` and `engine.py`, **bot token** and **chat id** must be replaced with your values. I’ve chosen to hard code the chat id for security reasons.
+## How-to
+1. Enable Raspberry Pi camera with `raspi-config`
+2. Install required `apt` and `pip` packages:
+```sh
+sudo apt update
+sudo apt install motion
+python -m pip install python-telegram-bot
+pìp install psutil telegram.ext
+```
+3. Add your user to `motion` group, in order to can manage `motion`: `sudo usermod -a -G motion <user>`
+4. Clone this repository.
+5. You'll need your Telegram chat id and a bot API key. After that, add these environment variables with these values: `TELEGRAM_ID`, `PALANTIR_KEY`.
 
 The main script is running as daemon (you have to kill it manually when needed) and handles a Telegram bot with the following commands:
 
-- `/snap` - *Take a snapshot and send it*: uses `fswebcam` to take a picture and immediately send it to the Telegram chat.
-- `/startmotion` - *Start motion surveillance*: start the Motion software with the personalised configuration file
-- `/stopmotion` - *Stop motion surveillance*: stop the Motion software with `proc.kill()`
-- `/checkmotion `- *Check if motion surveillance is on*: check from `ps` if the Motion software is running
-- `/sendlast` - *Send last picture taken by motion surveillance*: pictures are taken during the motion detection, the last one saved in the /pics folder is sent via Telegram
-- `/cleanpics` - *Delete all pictures taken by motion surveillance*: this delete all the `.jpg` files in the pics directory.  
+- `/snap` - *Take a shoot and send it*: uses `raspistill` to take a picture and immediately send it to the Telegram chat.
+- `/see` - *Start motion surveillance*: start the Motion software with the personalised configuration file
+- `/stop` - *Stop motion surveillance*: stop the Motion software with `proc.kill()`
+- `/check`- *Check if motion surveillance is on*: check from `ps` if the Motion software is running
+- `/lastphoto` - *Send last picture taken by motion surveillance*: pictures are taken during the motion detection, the last one saved in the /pics folder is sent via Telegram
+- `/lastvideo` - *Send last video taken by motion surveillance*: videos are taken during the motion detection, the last one saved in the /pics folder is sent via Telegram
+- `/clearphotos` - *Delete all photos taken by motion surveillance*: this delete all the `.jpg` files in the pics directory.
+- `/clearvideos` - *Delete all videos taken by motion surveillance*: this delete all the `.avi` files in the pics directory.
 
-[1]:	https://onion.io/store/omega2p/ "Onion Omega2+"
-[2]:	https://onion.io/store/expansion-dock/ "Expansions dock"
-[3]:	https://www.aliexpress.com/item/OTG-UVC-support-hd-endoscope-camera-module-Diameter-13mm-Linux-Android-Windows-MAC-with-LED-with/32761158688.html
-[4]:	https://github.com/Motion-Project/motion "Motion"
+_______________________________________________
+
+Forked from and based in ![ttan/motion-detection-telegram](https://github.com/ttan/motion-detection-telegram)
