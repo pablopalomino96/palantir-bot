@@ -18,6 +18,8 @@ pìp install psutil telegram.ext
 3. Add your user to `motion` group, in order to can manage `motion`: `sudo usermod -a -G motion <user>`
 4. Clone this repository.
 5. You'll need your Telegram chat id and a bot API key. After that, add these environment variables with these values: `TELEGRAM_ID`, `PALANTIR_KEY`.
+6. Create a `pics/` directory in the working directory.
+6. Run the script in daemon mode: `python engine.py`
 
 The main script is running as daemon (you have to kill it manually when needed) and handles a Telegram bot with the following commands:
 
